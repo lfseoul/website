@@ -1,9 +1,23 @@
 import { PortableText } from "@portabletext/react";
 import { setRequestLocale } from "next-intl/server";
+import { defineQuery } from "next-sanity";
 import Image from "next/image";
+import { draftMode } from "next/headers"; // 1. Added this import
 import LanguageSwitcher from "../../components/LanguageSwitcher";
 import { client } from "../../sanity/client";
-import { urlFor } from "../../sanity/image"; // Import your new helper
+import { urlFor } from "../../sanity/image";
+
+const HOME_PAGE_QUERY = defineQuery(`*[_type == "homePage"][0] {
+  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),
+  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),
+  "scroll1_title": select($locale == "en" => scroll1Title.en, $locale == "fr" => scroll1Title.fr, scroll1Title.kr),
+  "scroll1_text": select($locale == "en" => scroll1Text.en, $locale == "fr" => scroll1Text.fr, scroll1Text.kr),
+  "scroll2_title": select($locale == "en" => scroll2Title.en, $locale == "fr" => scroll2Title.fr, scroll2Title.kr),
+  "scroll2_text": select($locale == "en" => scroll2Text.en, $locale == "fr" => scroll2Text.fr, scroll2Text.kr),
+  heroImage,
+  scroll1Image,
+  scroll2Image
+}`);
 
 export default async function HomePage({
   params,
@@ -13,19 +27,20 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const query = `*[_type == "homePage"][0] {
-    "title": heroTitle[$locale],
-    "description": heroDescription[$locale],
-    "scroll1_title": scroll1Title[$locale],
-    "scroll1_text": scroll1Text[$locale],
-    "scroll2_title": scroll2Title[$locale],
-    "scroll2_text": scroll2Text[$locale],
-    heroImage,
-    scroll1Image,
-    scroll2Image
-  }`;
+  // 2. Check if draft mode is active
+  const { isEnabled } = await draftMode();
 
-  const content = await client.fetch(query, { locale }, { next: { revalidate: 60 } });
+  // 3. Fetch data conditionally based on draft mode status
+  const content = await client.fetch(
+    HOME_PAGE_QUERY, 
+    { locale }, 
+    { 
+      token: isEnabled ? process.env.SANITY_API_READ_TOKEN : undefined,
+      perspective: isEnabled ? "previewDrafts" : "published",
+      useCdn: !isEnabled,
+      next: { revalidate: isEnabled ? 0 : 60 } // Never cache drafts!
+    }
+  );
 
   if (!content) return <div>No content found.</div>;
 
@@ -46,7 +61,6 @@ export default async function HomePage({
             />
           </div>
         )}
-        {/* Softened the gradient here: */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 to-black/60 pointer-events-none -z-10" />
         
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 z-10 drop-shadow-lg">
