@@ -36,7 +36,7 @@ export default async function HomePage({
     { locale }, 
     { 
       token: isEnabled ? process.env.SANITY_API_READ_TOKEN : undefined,
-      perspective: isEnabled ? "previewDrafts" : "published",
+      perspective: isEnabled ? "drafts" : "published",
       useCdn: !isEnabled,
       stega: isEnabled,
       next: { revalidate: isEnabled ? 0 : 60 } // Never cache drafts!
