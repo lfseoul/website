@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import path from "path";
 
 // Point the plugin to the routing request file
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
@@ -17,7 +18,7 @@ const nextConfig: NextConfig = {
     ],
   },
   turbopack: {
-    root: "/home/patrice/Documents/Work/LFS/ws/lfs-website",
+    root: path.join(process.cwd(), ".."), 
     rules: {
       "*.css": {
         loaders: ["@tailwindcss/turbopack"],
