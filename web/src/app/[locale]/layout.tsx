@@ -1,4 +1,6 @@
 import { Analytics } from "@vercel/analytics/next"
+import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity/visual-editing";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
@@ -38,12 +40,16 @@ export default async function RootLayout({
   // Fetch all messages for the current language
   const messages = await getMessages();
 
+  // Check if draft mode is active
+  const { isEnabled } = await draftMode();
+
   return (
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} h-full antialiased min-h-full flex flex-col`}>
         {/* 3. Wrap your app in the provider and pass the messages */}
         <NextIntlClientProvider messages={messages}>
           {children}
+          {isEnabled && <VisualEditing />}
           <Analytics />
         </NextIntlClientProvider>
       </body>

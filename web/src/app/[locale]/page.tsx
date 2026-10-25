@@ -38,6 +38,7 @@ export default async function HomePage({
       token: isEnabled ? process.env.SANITY_API_READ_TOKEN : undefined,
       perspective: isEnabled ? "previewDrafts" : "published",
       useCdn: !isEnabled,
+      stega: isEnabled,
       next: { revalidate: isEnabled ? 0 : 60 } // Never cache drafts!
     }
   );
