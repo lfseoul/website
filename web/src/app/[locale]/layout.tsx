@@ -43,15 +43,23 @@ export default async function RootLayout({
   // Check if draft mode is active
   const { isEnabled } = await draftMode();
 
+  const isStaging = process.env.NEXT_PUBLIC_SANITY_DATASET === "staging";
+
   return (
     <html lang={locale}>
       <body className={`${geistSans.variable} ${geistMono.variable} h-full antialiased min-h-full flex flex-col`}>
-        {/* 3. Wrap your app in the provider and pass the messages */}
+        {/* Wrap the app in the provider and pass the messages */}
         <NextIntlClientProvider messages={messages}>
           {children}
           {isEnabled && <VisualEditing />}
           <Analytics />
         </NextIntlClientProvider>
+        {/* The Staging Environment Badge */}
+        {isStaging && (
+          <div className="fixed bottom-4 right-4 z-[9999] pointer-events-none bg-amber-500 text-black px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
+            Staging
+          </div>
+        )}
       </body>
     </html>
   );
