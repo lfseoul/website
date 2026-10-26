@@ -4,13 +4,9 @@ import { presentationTool } from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
 import {schemaTypes} from './schemaTypes'
 
-export default defineConfig({
-  name: 'default',
-  title: 'LFS Website',
-
+// 1. Group all existing settings so they apply to both workspaces
+const sharedConfig = {
   projectId: '925755f8',
-  dataset: 'production',
-
   plugins: [
     structureTool(), 
     visionTool(),
@@ -23,8 +19,25 @@ export default defineConfig({
       },
     }),
   ],
-
   schema: {
     types: schemaTypes,
   },
-})
+}
+
+// 2. Export an array of workspaces instead of a single object
+export default defineConfig([
+  {
+    name: 'production',
+    title: 'LFS Website (Production)',
+    dataset: 'production',
+    basePath: '/production',
+    ...sharedConfig,
+  },
+  {
+    name: 'staging',
+    title: 'LFS Website (Staging)',
+    dataset: 'staging',
+    basePath: '/staging',
+    ...sharedConfig,
+  }
+])
