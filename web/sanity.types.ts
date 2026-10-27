@@ -260,48 +260,10 @@ export type AllSanitySchemaTypes =
 
 // Source: ../web/src/app/[locale]/page.tsx
 // Variable: HOME_PAGE_QUERY
-// Query: *[_type == "homePage"][0] {  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),  "scroll1_title": select($locale == "en" => scroll1Title.en, $locale == "fr" => scroll1Title.fr, scroll1Title.kr),  "scroll1_text": select($locale == "en" => scroll1Text.en, $locale == "fr" => scroll1Text.fr, scroll1Text.kr),  "scroll2_title": select($locale == "en" => scroll2Title.en, $locale == "fr" => scroll2Title.fr, scroll2Title.kr),  "scroll2_text": select($locale == "en" => scroll2Text.en, $locale == "fr" => scroll2Text.fr, scroll2Text.kr),  heroImage,  scroll1Image,  scroll2Image}
+// Query: *[_type == "homePage" && !(_id in path("drafts.**"))][0] {  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),  heroImage,  "sections": sections[] {    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),    image,    youtubeId,    "videoUrl": backgroundVideo.asset->url // <-- Added this line!  }}
 export type HOME_PAGE_QUERY_RESULT = {
   title: string | null;
   description: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }> | null;
-  scroll1_title: string | null;
-  scroll1_text: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }> | null;
-  scroll2_title: string | null;
-  scroll2_text: Array<{
     children?: Array<{
       marks?: Array<string>;
       text?: string;
@@ -326,26 +288,13 @@ export type HOME_PAGE_QUERY_RESULT = {
     crop?: SanityImageCrop;
     _type: "image";
   } | null;
-  scroll1Image: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  } | null;
-  scroll2Image: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  } | null;
+  sections: null;
 } | null;
 
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '*[_type == "homePage"][0] {\n  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),\n  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),\n  "scroll1_title": select($locale == "en" => scroll1Title.en, $locale == "fr" => scroll1Title.fr, scroll1Title.kr),\n  "scroll1_text": select($locale == "en" => scroll1Text.en, $locale == "fr" => scroll1Text.fr, scroll1Text.kr),\n  "scroll2_title": select($locale == "en" => scroll2Title.en, $locale == "fr" => scroll2Title.fr, scroll2Title.kr),\n  "scroll2_text": select($locale == "en" => scroll2Text.en, $locale == "fr" => scroll2Text.fr, scroll2Text.kr),\n  heroImage,\n  scroll1Image,\n  scroll2Image\n}': HOME_PAGE_QUERY_RESULT;
+    '*[_type == "homePage" && !(_id in path("drafts.**"))][0] {\n  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),\n  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),\n  heroImage,\n  "sections": sections[] {\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),\n    image,\n    youtubeId,\n    "videoUrl": backgroundVideo.asset->url // <-- Added this line!\n  }\n}': HOME_PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

@@ -1,108 +1,182 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring, Variants } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useTransform,
+  useSpring,
+  Variants,
+} from "framer-motion";
 import { PortableText } from "@portabletext/react";
 import Image from "next/image";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { urlFor } from "../sanity/image";
 
+// Helper to extract the 11-character YouTube ID from a full URL or raw ID
+function extractYouTubeId(urlOrId: string) {
+  if (!urlOrId) return null;
+  const regExp =
+    /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = urlOrId.match(regExp);
+  return match && match[2].length === 11 ? match[2] : urlOrId;
+}
+
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
 };
 
-// 1. Create a reusable component to isolate the scroll tracking for each section
-function ParallaxSection({ image, children, className }: { image: any; children: React.ReactNode; className: string }) {
+// Create a reusable component to isolate the scroll tracking for each section
+function ParallaxSection({
+  image,
+  videoUrl,
+  youtubeId,
+  children,
+  className,
+}: {
+  image?: any;
+  videoUrl?: string;
+  youtubeId?: string;
+  children: React.ReactNode;
+  className: string;
+}) {
   const ref = useRef<HTMLElement>(null);
-  
-  // Track when this specific section enters and leaves the screen
+
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start end", "end start"], 
+    offset: ["start end", "end start"],
   });
 
-  // Wrap the raw scroll progress in a physics-based spring
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100, // Higher = tighter, more responsive. Lower = looser, more delayed.
-    damping: 30,    // Higher = less bounciness. Lower = more rubber-band effect.
-    restDelta: 0.001
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
   });
-
-  // Pass the smoothed spring value into useTransform instead of the raw progress
-  // Map the scroll progress (0 to 1) to vertical movement (-20% to 20%)
   const y = useTransform(smoothProgress, [0, 1], ["-20%", "20%"]);
 
+  // Extract the clean ID before rendering
+  const cleanVideoId = youtubeId ? extractYouTubeId(youtubeId) : null;
+
   return (
-    <section ref={ref} className={`relative h-screen flex flex-col justify-center overflow-hidden ${className}`}>
-      {image && (
-        // 2. We make the image 140% tall and shift it up by 20%. 
-        // This gives it extra hidden room at the top and bottom so it doesn't show empty edges when moving!
-        <motion.div 
-          style={{ y }}  // This now receives the beautifully smoothed spring values!
-          className="absolute inset-0 -z-10 h-[140%] -top-[20%] w-full"
-        >
-          <Image src={urlFor(image).url()} alt="Background" fill className="object-cover opacity-60" priority />
-        </motion.div>
-      )}
-      
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/80 pointer-events-none -z-10" />
-      
-      {/* The text content stays static while the image behind it moves */}
-      <div className="z-10 w-full">
+    <section
+      ref={ref}
+      className={`relative h-screen flex flex-col justify-center overflow-hidden ${className}`}
+    >
+      {/* LAYER 1: Background Video OR YouTube OR Image */}
+      <motion.div
+        style={{ y }}
+        className="absolute inset-0 w-full h-[140%] -top-[20%] pointer-events-none"
+      >
+        {videoUrl ? (
+          // Native HTML5 Video (0 console errors, instant load, perfect looping)
+          <video
+            src={videoUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          />
+        ) : cleanVideoId ? (
+          // YouTube Fallback
+          <iframe
+            src={`https://www.youtubeeducation.com/embed/${cleanVideoId}?autoplay=1&mute=1&loop=1&controls=0&rel=0&playsinline=1&playlist=${cleanVideoId}`}
+            className="absolute top-1/2 left-1/2 w-[150vw] h-[150vh] -translate-x-1/2 -translate-y-1/2 object-cover pointer-events-none"
+            title="LFS Background Video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+          />
+        ) : image ? (
+          <Image
+            src={urlFor(image).url()}
+            alt="Background"
+            fill
+            className="object-cover"
+            priority
+          />
+        ) : null}
+      </motion.div>
+
+      {/* LAYER 2 & 3: Overlay and Text */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/60 pointer-events-none" />
+      <div className="relative z-10 w-full drop-shadow-[0_5px_15px_rgba(0,0,0,0.8)]">
         {children}
       </div>
     </section>
   );
 }
 
-// 3. Keep your main component clean by composing the sections
-export default function ScrollytellingView({ content, locale }: { content: any, locale: string }) {
+export default function ScrollytellingView({
+  content,
+  locale,
+}: {
+  content: any;
+  locale: string;
+}) {
   return (
     <main className="bg-black text-white selection:bg-white selection:text-black overflow-hidden">
       <LanguageSwitcher currentLocale={locale} />
 
-      {/* SECTION 1: HERO */}
-      <ParallaxSection image={content.heroImage} className="items-center p-8 text-center">
-        <motion.h1 
-          variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: false }}
+      {/* HERO SECTION (Static) */}
+      <ParallaxSection
+        image={content.heroImage}
+        className="items-center p-8 text-center"
+      >
+        <motion.h1
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false }}
           className="text-5xl md:text-7xl font-bold tracking-tight mb-6 drop-shadow-lg"
         >
           {content.title}
         </motion.h1>
-        <motion.div 
-          variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: false }}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false }}
           className="mx-auto text-xl md:text-3xl text-gray-200 max-w-3xl drop-shadow-md space-y-4"
         >
           <PortableText value={content.description} />
         </motion.div>
       </ParallaxSection>
 
-      {/* SECTION 2 */}
-      <ParallaxSection image={content.scroll1Image} className="items-start p-8 md:p-24">
-        <motion.div 
-          variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ amount: 0.5 }}
-          className="max-w-2xl"
-        >
-          <h2 className="text-4xl md:text-6xl font-semibold mb-6 drop-shadow-lg">{content.scroll1_title}</h2>
-          <div className="text-xl md:text-2xl text-gray-200 leading-relaxed drop-shadow-md space-y-4">
-            <PortableText value={content.scroll1_text} />
-          </div>
-        </motion.div>
-      </ParallaxSection>
+      {/* DYNAMIC SECTIONS */}
+      {content.sections?.map((section: any, index: number) => {
+        // Alternate left/right alignment based on whether the index is even or odd
+        const isEven = index % 2 === 0;
+        const alignmentClass = isEven
+          ? "items-start text-left"
+          : "items-end text-right";
+        const marginClass = isEven ? "" : "ml-auto";
 
-      {/* SECTION 3 */}
-      <ParallaxSection image={content.scroll2Image} className="items-end p-8 md:p-24 text-right">
-        <motion.div 
-          variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ amount: 0.5 }}
-          className="max-w-2xl ml-auto"
-        >
-          <h2 className="text-4xl md:text-6xl font-semibold mb-6 drop-shadow-lg">{content.scroll2_title}</h2>
-          <div className="text-xl md:text-2xl text-gray-200 leading-relaxed drop-shadow-md space-y-4">
-            <PortableText value={content.scroll2_text} />
-          </div>
-        </motion.div>
-      </ParallaxSection>
+        return (
+          <ParallaxSection
+            key={index}
+            image={section.image}
+            youtubeId={section.youtubeId}
+            className={`p-8 md:p-24 ${alignmentClass}`}
+          >
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ amount: 0.5 }}
+              className={`max-w-2xl ${marginClass}`}
+            >
+              <h2 className="text-4xl md:text-6xl font-semibold mb-6 drop-shadow-lg">
+                {section.title}
+              </h2>
+              <div className="text-xl md:text-2xl text-gray-200 leading-relaxed drop-shadow-md space-y-4">
+                <PortableText value={section.text} />
+              </div>
+            </motion.div>
+          </ParallaxSection>
+        );
+      })}
     </main>
   );
 }
