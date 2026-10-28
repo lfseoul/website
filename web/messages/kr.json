@@ -6,5 +6,18 @@
     "scroll1_text": "1974년부터 우리는 글로벌 인재를 양성해 왔습니다.",
     "scroll2_title": "이중언어 마스터",
     "scroll2_text": "세계를 무대로 나아갈 학생들을 위한 몰입형 교육."
+  },
+  "NewsAndEvents": {
+    "heading": "최신 뉴스 및 행사",
+    "description": "캠퍼스의 활기찬 소식과 커뮤니티의 주요 일정을 확인해 보세요.",
+    "viewAllNews": "전체 뉴스 보기",
+    "archiveHeading": "전체 뉴스 및 행사",
+    "archiveDescription": "학교 공동체의 소식과 예정된 행사를 확인해 보세요.",
+    "emptyMessage": "아직 표시할 뉴스가 없습니다.",
+    "categories": {
+      "academic": "학사",
+      "admissions": "입학",
+      "campusLife": "캠퍼스 생활"
+    }
   }
 }

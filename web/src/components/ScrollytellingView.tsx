@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import {
   motion,
   useScroll,
@@ -8,10 +8,33 @@ import {
   useSpring,
   Variants,
 } from "framer-motion";
-import { PortableText } from "@portabletext/react";
+import { PortableText, type PortableTextProps } from "@portabletext/react";
 import Image from "next/image";
 import LanguageSwitcher from "./LanguageSwitcher";
+import NewsAndEvents, {
+  type NewsAndEventsLabels,
+  type NewsArticle,
+} from "./NewsAndEvents";
 import { urlFor } from "../sanity/image";
+
+type PortableTextValue = PortableTextProps["value"];
+type SanityImage = {
+  asset?: { _ref: string; _type: "reference" } | null;
+} | null;
+type ScrollytellingSection = {
+  title?: string | null;
+  text?: PortableTextValue;
+  image?: SanityImage;
+  youtubeId?: string | null;
+  videoUrl?: string | null;
+};
+type ScrollytellingContent = {
+  title?: string | null;
+  description?: PortableTextValue;
+  heroImage?: SanityImage;
+  sections?: ScrollytellingSection[] | null;
+  newsArticles?: Array<NewsArticle | null> | null;
+};
 
 // Helper to extract the 11-character YouTube ID from a full URL or raw ID
 function extractYouTubeId(urlOrId: string) {
@@ -35,9 +58,9 @@ function ParallaxSection({
   children,
   className,
 }: {
-  image?: any;
+  image?: SanityImage;
   videoUrl?: string;
-  youtubeId?: string;
+  youtubeId?: string | null;
   children: React.ReactNode;
   className: string;
 }) {
@@ -111,10 +134,14 @@ function ParallaxSection({
 export default function ScrollytellingView({
   content,
   locale,
+  newsLabels,
 }: {
-  content: any;
+  content: ScrollytellingContent;
   locale: string;
+  newsLabels: NewsAndEventsLabels;
 }) {
+  const newsArticles = content.newsArticles ?? [];
+
   return (
     <main className="bg-black text-white selection:bg-white selection:text-black overflow-hidden">
       <LanguageSwitcher currentLocale={locale} />
@@ -129,7 +156,7 @@ export default function ScrollytellingView({
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false }}
-          className="text-5xl md:text-7xl font-bold tracking-tight mb-6 drop-shadow-lg"
+          className="mb-6 w-full text-center text-5xl font-bold tracking-tight drop-shadow-lg md:text-7xl"
         >
           {content.title}
         </motion.h1>
@@ -145,36 +172,50 @@ export default function ScrollytellingView({
       </ParallaxSection>
 
       {/* DYNAMIC SECTIONS */}
-      {content.sections?.map((section: any, index: number) => {
+      {content.sections?.map((section, index) => {
         // Alternate left/right alignment based on whether the index is even or odd
         const isEven = index % 2 === 0;
         const alignmentClass = isEven
           ? "items-start text-left"
           : "items-end text-right";
         const marginClass = isEven ? "" : "ml-auto";
+        const accentClass = isEven ? "bg-red-600" : "bg-blue-500";
 
         return (
-          <ParallaxSection
-            key={index}
-            image={section.image}
-            youtubeId={section.youtubeId}
-            className={`p-8 md:p-24 ${alignmentClass}`}
-          >
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ amount: 0.5 }}
-              className={`max-w-2xl ${marginClass}`}
+          <Fragment key={index}>
+            <ParallaxSection
+              image={section.image}
+              youtubeId={section.youtubeId}
+              className={`p-8 md:p-24 ${alignmentClass}`}
             >
-              <h2 className="text-4xl md:text-6xl font-semibold mb-6 drop-shadow-lg">
-                {section.title}
-              </h2>
-              <div className="text-xl md:text-2xl text-gray-200 leading-relaxed drop-shadow-md space-y-4">
-                <PortableText value={section.text} />
-              </div>
-            </motion.div>
-          </ParallaxSection>
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ amount: 0.5 }}
+                className={`max-w-2xl ${marginClass}`}
+              >
+                <div
+                  aria-hidden="true"
+                  className={`mb-5 h-1 w-9 ${accentClass} ${isEven ? "" : "ml-auto"}`}
+                />
+                <h2 className="text-4xl md:text-6xl font-semibold mb-6 drop-shadow-lg">
+                  {section.title}
+                </h2>
+                <div className="text-xl md:text-2xl text-gray-200 leading-relaxed drop-shadow-md space-y-4">
+                  <PortableText value={section.text} />
+                </div>
+              </motion.div>
+            </ParallaxSection>
+            {index === 3 && (
+              <NewsAndEvents
+                articles={newsArticles}
+                locale={locale}
+                labels={newsLabels}
+                viewAllHref={`/${locale}/news`}
+              />
+            )}
+          </Fragment>
         );
       })}
     </main>

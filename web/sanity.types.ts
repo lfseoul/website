@@ -258,9 +258,14 @@ export type AllSanitySchemaTypes =
   | Geopoint
   | Slug;
 
+// Source: ../web/src/app/[locale]/news/page.tsx
+// Variable: NEWS_QUERY
+// Query: *[_type == "newsArticle" && !(_id in path("drafts.**"))] | order(publishedAt desc) {  _id,  "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),  "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),  category,  publishedAt,  mainImage}
+export type NEWS_QUERY_RESULT = Array<never>;
+
 // Source: ../web/src/app/[locale]/page.tsx
 // Variable: HOME_PAGE_QUERY
-// Query: *[_type == "homePage" && !(_id in path("drafts.**"))][0] {  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),  heroImage,  "sections": sections[] {    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),    image,    youtubeId,    "videoUrl": backgroundVideo.asset->url // <-- Added this line!  }}
+// Query: *[_type == "homePage" && !(_id in path("drafts.**"))][0] {  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),  heroImage,  "sections": sections[] {    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),    image,    youtubeId,    "videoUrl": backgroundVideo.asset->url // <-- Added this line!  },  "newsArticles": newsArticles[0...3]-> {    _id,    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),    category,    publishedAt,    mainImage  }}
 export type HOME_PAGE_QUERY_RESULT = {
   title: string | null;
   description: Array<{
@@ -289,12 +294,14 @@ export type HOME_PAGE_QUERY_RESULT = {
     _type: "image";
   } | null;
   sections: null;
+  newsArticles: null;
 } | null;
 
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '*[_type == "homePage" && !(_id in path("drafts.**"))][0] {\n  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),\n  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),\n  heroImage,\n  "sections": sections[] {\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),\n    image,\n    youtubeId,\n    "videoUrl": backgroundVideo.asset->url // <-- Added this line!\n  }\n}': HOME_PAGE_QUERY_RESULT;
+    '*[_type == "newsArticle" && !(_id in path("drafts.**"))] | order(publishedAt desc) {\n  _id,\n  "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n  "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),\n  category,\n  publishedAt,\n  mainImage\n}': NEWS_QUERY_RESULT;
+    '*[_type == "homePage" && !(_id in path("drafts.**"))][0] {\n  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),\n  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),\n  heroImage,\n  "sections": sections[] {\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),\n    image,\n    youtubeId,\n    "videoUrl": backgroundVideo.asset->url // <-- Added this line!\n  },\n  "newsArticles": newsArticles[0...3]-> {\n    _id,\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),\n    category,\n    publishedAt,\n    mainImage\n  }\n}': HOME_PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

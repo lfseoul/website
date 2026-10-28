@@ -6,5 +6,18 @@
     "scroll1_text": "Depuis 1974, nous formons des citoyens du monde.",
     "scroll2_title": "Maîtrise Bilingue",
     "scroll2_text": "Une éducation immersive qui prépare les élèves pour le monde."
+  },
+  "NewsAndEvents": {
+    "heading": "Actualités et événements récents",
+    "description": "Suivez la vie de notre campus et les prochaines dates importantes pour notre communauté.",
+    "viewAllNews": "Voir toutes les actualités",
+    "archiveHeading": "Toutes les actualités et événements",
+    "archiveDescription": "Les actualités et événements à venir de notre communauté scolaire.",
+    "emptyMessage": "Aucun article d’actualité à afficher pour le moment.",
+    "categories": {
+      "academic": "Scolaire",
+      "admissions": "Admissions",
+      "campusLife": "Vie du campus"
+    }
   }
 }

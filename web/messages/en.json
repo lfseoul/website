@@ -6,5 +6,18 @@
     "scroll1_text": "Since 1974, we have been nurturing global citizens.",
     "scroll2_title": "Bilingual Mastery",
     "scroll2_text": "Immersive education that prepares students for the world."
+  },
+  "NewsAndEvents": {
+    "heading": "Latest News & Events",
+    "description": "Stay updated with the vibrant life on our campus and upcoming important dates for the community.",
+    "viewAllNews": "View all news",
+    "archiveHeading": "All News & Events",
+    "archiveDescription": "News and upcoming events from our school community.",
+    "emptyMessage": "There are no news articles to display yet.",
+    "categories": {
+      "academic": "Academic",
+      "admissions": "Admissions",
+      "campusLife": "Campus Life"
+    }
   }
 }
