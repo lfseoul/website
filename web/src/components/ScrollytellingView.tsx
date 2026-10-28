@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useRef } from "react";
+import { useRef } from "react";
 import {
   motion,
   useScroll,
@@ -10,7 +10,9 @@ import {
 } from "framer-motion";
 import { PortableText, type PortableTextProps } from "@portabletext/react";
 import Image from "next/image";
-import LanguageSwitcher from "./LanguageSwitcher";
+import Navbar from "./Navbar";
+import Footer from "./Footer";
+import type { FooterSettings } from "./Footer";
 import NewsAndEvents, {
   type NewsAndEventsLabels,
   type NewsArticle,
@@ -133,10 +135,12 @@ function ParallaxSection({
 
 export default function ScrollytellingView({
   content,
+  settings,
   locale,
   newsLabels,
 }: {
   content: ScrollytellingContent;
+  settings: FooterSettings;
   locale: string;
   newsLabels: NewsAndEventsLabels;
 }) {
@@ -144,7 +148,7 @@ export default function ScrollytellingView({
 
   return (
     <main className="bg-black text-white selection:bg-white selection:text-black overflow-hidden">
-      <LanguageSwitcher currentLocale={locale} />
+      <Navbar currentLocale={locale} />
 
       {/* HERO SECTION (Static) */}
       <ParallaxSection
@@ -182,42 +186,41 @@ export default function ScrollytellingView({
         const accentClass = isEven ? "bg-red-600" : "bg-blue-500";
 
         return (
-          <Fragment key={index}>
-            <ParallaxSection
-              image={section.image}
-              youtubeId={section.youtubeId}
-              className={`p-8 md:p-24 ${alignmentClass}`}
+          <ParallaxSection
+            key={index}
+            image={section.image}
+            youtubeId={section.youtubeId}
+            className={`p-8 md:p-24 ${alignmentClass}`}
+          >
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ amount: 0.5 }}
+              className={`max-w-2xl ${marginClass}`}
             >
-              <motion.div
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ amount: 0.5 }}
-                className={`max-w-2xl ${marginClass}`}
-              >
-                <div
-                  aria-hidden="true"
-                  className={`mb-5 h-1 w-9 ${accentClass} ${isEven ? "" : "ml-auto"}`}
-                />
-                <h2 className="text-4xl md:text-6xl font-semibold mb-6 drop-shadow-lg">
-                  {section.title}
-                </h2>
-                <div className="text-xl md:text-2xl text-gray-200 leading-relaxed drop-shadow-md space-y-4">
-                  <PortableText value={section.text} />
-                </div>
-              </motion.div>
-            </ParallaxSection>
-            {index === 3 && (
-              <NewsAndEvents
-                articles={newsArticles}
-                locale={locale}
-                labels={newsLabels}
-                viewAllHref={`/${locale}/news`}
+              <div
+                aria-hidden="true"
+                className={`mb-5 h-1 w-9 ${accentClass} ${isEven ? "" : "ml-auto"}`}
               />
-            )}
-          </Fragment>
+              <h2 className="text-4xl md:text-6xl font-semibold mb-6 drop-shadow-lg">
+                {section.title}
+              </h2>
+              <div className="text-xl md:text-2xl text-gray-200 leading-relaxed drop-shadow-md space-y-4">
+                <PortableText value={section.text} />
+              </div>
+            </motion.div>
+          </ParallaxSection>
         );
       })}
+
+      <NewsAndEvents
+        articles={newsArticles}
+        locale={locale}
+        labels={newsLabels}
+        viewAllHref={`/${locale}/news`}
+      />
+      <Footer settings={settings} />
     </main>
   );
 }

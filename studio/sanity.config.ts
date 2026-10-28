@@ -1,15 +1,21 @@
-import {defineConfig} from 'sanity'
+import {defineConfig, defineSingleton} from 'sanity'
 import {structureTool} from 'sanity/structure'
-import { presentationTool } from 'sanity/presentation'
+import {presentationTool} from 'sanity/presentation'
 import {visionTool} from '@sanity/vision'
-import { crossDatasetDuplicator } from '@sanity/cross-dataset-duplicator' // 1. Import the plugin
+import {crossDatasetDuplicator} from '@sanity/cross-dataset-duplicator' // 1. Import the plugin
 import {schemaTypes} from './schemaTypes'
+
+const siteSettingsSingleton = defineSingleton({
+  id: 'siteSettings',
+  documentId: 'siteSettings',
+  schemaType: 'siteSettings',
+})
 
 // 1. Group all existing settings so they apply to both workspaces
 const sharedConfig = {
   projectId: '925755f8',
   plugins: [
-    structureTool(), 
+    structureTool(),
     visionTool(),
     presentationTool({
       previewUrl: {
@@ -21,14 +27,17 @@ const sharedConfig = {
     }),
     // 2. Add the plugin to your shared plugins array
     crossDatasetDuplicator({
-      // Optional: Add the names of your schema types here if you want to restrict 
-      // which documents can be duplicated (e.g., types: ['page', 'article']). 
+      // Optional: Add the names of your schema types here if you want to restrict
+      // which documents can be duplicated (e.g., types: ['page', 'article']).
       // Leaving it empty or omitting `types` makes it available for all document types.
-      types: [], 
+      types: [],
     }),
   ],
   schema: {
     types: schemaTypes,
+  },
+  document: {
+    singletons: [siteSettingsSingleton],
   },
 }
 
@@ -47,5 +56,5 @@ export default defineConfig([
     dataset: 'staging',
     basePath: '/staging',
     ...sharedConfig,
-  }
+  },
 ])

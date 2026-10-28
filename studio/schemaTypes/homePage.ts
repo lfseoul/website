@@ -65,4 +65,18 @@ export const homePage = defineType({
       ],
     }),
   ],
+  preview: {
+    select: {
+      title: 'heroTitle.en',
+      subtitle: 'heroDescription.en.0.children.0.text',
+      media: 'heroImage',
+    },
+    prepare({title, subtitle, media}) {
+      return {
+        title: title || 'Home Page Content',
+        subtitle: subtitle ? `English: ${subtitle}` : 'Localized homepage content',
+        media,
+      }
+    },
+  },
 })

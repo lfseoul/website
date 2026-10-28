@@ -15,62 +15,33 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
-export type HomePage = {
+export type SiteSettings = {
   _id: string;
-  _type: "homePage";
+  _type: "siteSettings";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  heroTitle?: LocalizedString;
-  heroDescription?: LocalizedBlock;
-  scroll1Title?: LocalizedString;
-  scroll1Text?: LocalizedBlock;
-  scroll2Title?: LocalizedString;
-  scroll2Text?: LocalizedBlock;
-  heroImage?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  };
-  scroll1Image?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
-  };
-  scroll2Image?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    _type: "image";
+  siteTitle?: string;
+  footerDescription?: LocalizedBlock;
+  quickLinks?: Array<{
+    label?: LocalizedString;
+    url?: string;
+    _type: "quickLink";
+    _key: string;
+  }>;
+  contactInfo?: {
+    address?: LocalizedString;
+    phoneNumber?: string;
+    email?: string;
+    website?: string;
   };
 };
 
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
+export type LocalizedString = {
+  _type: "localizedString";
+  en?: string;
+  fr?: string;
+  kr?: string;
 };
 
 export type LocalizedBlock = {
@@ -131,11 +102,108 @@ export type LocalizedBlock = {
   }>;
 };
 
-export type LocalizedString = {
-  _type: "localizedString";
-  en?: string;
-  fr?: string;
-  kr?: string;
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type NewsArticle = {
+  _id: string;
+  _type: "newsArticle";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: LocalizedString;
+  slug?: Slug;
+  category?: "academic" | "admissions" | "campusLife";
+  publishedAt?: string;
+  excerpt?: LocalizedString;
+  mainImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
+export type NewsArticleReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "newsArticle";
+};
+
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
+};
+
+export type HomePage = {
+  _id: string;
+  _type: "homePage";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  heroTitle?: LocalizedString;
+  heroDescription?: LocalizedBlock;
+  heroImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  newsArticles?: Array<
+    {
+      _key: string;
+    } & NewsArticleReference
+  >;
+  sections?: Array<{
+    title?: LocalizedString;
+    text?: LocalizedBlock;
+    image?: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    };
+    backgroundVideo?: {
+      asset?: SanityFileAssetReference;
+      media?: unknown;
+      _type: "file";
+    };
+    youtubeId?: string;
+    _type: "section";
+    _key: string;
+  }>;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -235,19 +303,18 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
-};
-
 export type AllSanitySchemaTypes =
+  | SiteSettings
+  | LocalizedString
+  | LocalizedBlock
   | SanityImageAssetReference
-  | HomePage
+  | NewsArticle
   | SanityImageCrop
   | SanityImageHotspot
-  | LocalizedBlock
-  | LocalizedString
+  | Slug
+  | NewsArticleReference
+  | SanityFileAssetReference
+  | HomePage
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -255,53 +322,125 @@ export type AllSanitySchemaTypes =
   | SanityFileAsset
   | SanityAssetSourceData
   | SanityImageAsset
-  | Geopoint
-  | Slug;
+  | Geopoint;
 
 // Source: ../web/src/app/[locale]/news/page.tsx
 // Variable: NEWS_QUERY
 // Query: *[_type == "newsArticle" && !(_id in path("drafts.**"))] | order(publishedAt desc) {  _id,  "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),  "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),  category,  publishedAt,  mainImage}
-export type NEWS_QUERY_RESULT = Array<never>;
-
-// Source: ../web/src/app/[locale]/page.tsx
-// Variable: HOME_PAGE_QUERY
-// Query: *[_type == "homePage" && !(_id in path("drafts.**"))][0] {  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),  heroImage,  "sections": sections[] {    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),    image,    youtubeId,    "videoUrl": backgroundVideo.asset->url // <-- Added this line!  },  "newsArticles": newsArticles[0...3]-> {    _id,    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),    category,    publishedAt,    mainImage  }}
-export type HOME_PAGE_QUERY_RESULT = {
+export type NEWS_QUERY_RESULT = Array<{
+  _id: string;
   title: string | null;
-  description: Array<{
-    children?: Array<{
-      marks?: Array<string>;
-      text?: string;
-      _type: "span";
-      _key: string;
-    }>;
-    style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
-    listItem?: "bullet" | "number";
-    markDefs?: Array<{
-      href?: string;
-      _type: "link";
-      _key: string;
-    }>;
-    level?: number;
-    _type: "block";
-    _key: string;
-  }> | null;
-  heroImage: {
+  excerpt: string | null;
+  category: "academic" | "admissions" | "campusLife" | null;
+  publishedAt: string | null;
+  mainImage: {
     asset?: SanityImageAssetReference;
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     _type: "image";
   } | null;
-  sections: null;
-  newsArticles: null;
-} | null;
+}>;
+
+// Source: ../web/src/app/[locale]/page.tsx
+// Variable: PAGE_QUERY
+// Query: {  "home": *[_type == "homePage" && !(_id in path("drafts.**"))][0] {  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),  heroImage,  "sections": sections[] {    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),    image,    youtubeId,    "videoUrl": backgroundVideo.asset->url // <-- Added this line!  },  "newsArticles": newsArticles[0...3]-> {    _id,    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),    category,    publishedAt,    mainImage  }  },  "settings": *[_type == "siteSettings" && !(_id in path("drafts.**"))][0] {    siteTitle,    "footerDescription": select(      $locale == "en" => pt::text(footerDescription.en),      $locale == "fr" => pt::text(footerDescription.fr),      pt::text(footerDescription.kr)    ),    "quickLinks": quickLinks[]{      _key,      "label": select($locale == "en" => label.en, $locale == "fr" => label.fr, label.kr),      url    },    "contactInfo": {      "address": select(        $locale == "en" => contactInfo.address.en,        $locale == "fr" => contactInfo.address.fr,        contactInfo.address.kr      ),      phoneNumber,      email,      website    }  }}
+export type PAGE_QUERY_RESULT = {
+  home: {
+    title: string | null;
+    description: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+      listItem?: "bullet" | "number";
+      markDefs?: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }>;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }> | null;
+    heroImage: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+    sections: Array<{
+      title: string | null;
+      text: Array<{
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?:
+          "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href?: string;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }> | null;
+      image: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        _type: "image";
+      } | null;
+      youtubeId: string | null;
+      videoUrl: string | null;
+    }> | null;
+    newsArticles: Array<{
+      _id: string;
+      title: string | null;
+      excerpt: string | null;
+      category: "academic" | "admissions" | "campusLife" | null;
+      publishedAt: string | null;
+      mainImage: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        _type: "image";
+      } | null;
+    }> | null;
+  } | null;
+  settings: {
+    siteTitle: string | null;
+    footerDescription: string;
+    quickLinks: Array<{
+      _key: string;
+      label: string | null;
+      url: string | null;
+    }> | null;
+    contactInfo: {
+      address: string | null;
+      phoneNumber: null;
+      email: null;
+      website: null;
+    };
+  } | null;
+};
 
 // Query TypeMap
 declare global {
   interface SanityQueries {
     '*[_type == "newsArticle" && !(_id in path("drafts.**"))] | order(publishedAt desc) {\n  _id,\n  "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n  "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),\n  category,\n  publishedAt,\n  mainImage\n}': NEWS_QUERY_RESULT;
-    '*[_type == "homePage" && !(_id in path("drafts.**"))][0] {\n  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),\n  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),\n  heroImage,\n  "sections": sections[] {\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),\n    image,\n    youtubeId,\n    "videoUrl": backgroundVideo.asset->url // <-- Added this line!\n  },\n  "newsArticles": newsArticles[0...3]-> {\n    _id,\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),\n    category,\n    publishedAt,\n    mainImage\n  }\n}': HOME_PAGE_QUERY_RESULT;
+    '{\n  "home": *[_type == "homePage" && !(_id in path("drafts.**"))][0] {\n  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),\n  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),\n  heroImage,\n  "sections": sections[] {\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),\n    image,\n    youtubeId,\n    "videoUrl": backgroundVideo.asset->url // <-- Added this line!\n  },\n  "newsArticles": newsArticles[0...3]-> {\n    _id,\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),\n    category,\n    publishedAt,\n    mainImage\n  }\n  },\n  "settings": *[_type == "siteSettings" && !(_id in path("drafts.**"))][0] {\n    siteTitle,\n    "footerDescription": select(\n      $locale == "en" => pt::text(footerDescription.en),\n      $locale == "fr" => pt::text(footerDescription.fr),\n      pt::text(footerDescription.kr)\n    ),\n    "quickLinks": quickLinks[]{\n      _key,\n      "label": select($locale == "en" => label.en, $locale == "fr" => label.fr, label.kr),\n      url\n    },\n    "contactInfo": {\n      "address": select(\n        $locale == "en" => contactInfo.address.en,\n        $locale == "fr" => contactInfo.address.fr,\n        contactInfo.address.kr\n      ),\n      phoneNumber,\n      email,\n      website\n    }\n  }\n}': PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

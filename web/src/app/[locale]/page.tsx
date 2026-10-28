@@ -5,8 +5,8 @@ import { draftMode } from "next/headers";
 import { client } from "../../sanity/client";
 import ScrollytellingView from "../../components/ScrollytellingView";
 
-const HOME_PAGE_QUERY =
-  defineQuery(`*[_type == "homePage" && !(_id in path("drafts.**"))][0] {
+const PAGE_QUERY = defineQuery(`{
+  "home": *[_type == "homePage" && !(_id in path("drafts.**"))][0] {
   "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),
   "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),
   heroImage,
@@ -24,6 +24,30 @@ const HOME_PAGE_QUERY =
     category,
     publishedAt,
     mainImage
+  }
+  },
+  "settings": *[_type == "siteSettings" && !(_id in path("drafts.**"))][0] {
+    siteTitle,
+    "footerDescription": select(
+      $locale == "en" => pt::text(footerDescription.en),
+      $locale == "fr" => pt::text(footerDescription.fr),
+      pt::text(footerDescription.kr)
+    ),
+    "quickLinks": quickLinks[]{
+      _key,
+      "label": select($locale == "en" => label.en, $locale == "fr" => label.fr, label.kr),
+      url
+    },
+    "contactInfo": {
+      "address": select(
+        $locale == "en" => contactInfo.address.en,
+        $locale == "fr" => contactInfo.address.fr,
+        contactInfo.address.kr
+      ),
+      phoneNumber,
+      email,
+      website
+    }
   }
 }`);
 
@@ -49,8 +73,8 @@ export default async function HomePage({
 
   const { isEnabled } = await draftMode();
 
-  const content = await client.fetch(
-    HOME_PAGE_QUERY,
+  const pageData = await client.fetch(
+    PAGE_QUERY,
     { locale },
     {
       token: isEnabled ? process.env.SANITY_API_READ_TOKEN : undefined,
@@ -61,12 +85,13 @@ export default async function HomePage({
     },
   );
 
-  if (!content) return <div>No content found.</div>;
+  if (!pageData?.home) return <div>No content found.</div>;
 
   // Pass the fetched data directly to the animated client component
   return (
     <ScrollytellingView
-      content={content}
+      content={pageData.home}
+      settings={pageData.settings}
       locale={locale}
       newsLabels={newsLabels}
     />
