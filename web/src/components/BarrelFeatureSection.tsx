@@ -152,14 +152,14 @@ function HelixCard({
   );
 }
 
-export default function BarrelFeatureSection({
+function BarrelFeatureContent({
   features,
   heading,
-  layout = "barrel",
+  layout,
 }: {
-  features: Array<SchoolFeature | null>;
+  features: SchoolFeature[];
   heading: string;
-  layout?: "barrel" | "helix";
+  layout: "barrel" | "helix";
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -201,10 +201,6 @@ export default function BarrelFeatureSection({
     barrel.addEventListener("wheel", handleWheel, { passive: false });
     return () => barrel.removeEventListener("wheel", handleWheel);
   }, [dragRotation]);
-
-  const visibleFeatures = features.filter((feature): feature is SchoolFeature =>
-    Boolean(feature?.title && feature.linkUrl),
-  );
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary || event.button !== 0) return;
@@ -258,8 +254,6 @@ export default function BarrelFeatureSection({
     suppressClickRef.current = false;
   };
 
-  if (visibleFeatures.length === 0) return null;
-
   return (
     <section
       id="school-features"
@@ -282,21 +276,21 @@ export default function BarrelFeatureSection({
             onClickCapture={handleCardClickCapture}
             className="relative flex h-full w-full touch-pan-y items-center justify-center [transform-style:preserve-3d] md:cursor-grab md:active:cursor-grabbing"
           >
-            {visibleFeatures.map((feature, index) => {
+            {features.map((feature, index) => {
               if (layout === "helix") {
                 return (
                   <HelixCard
                     key={feature._id}
                     feature={feature}
                     index={index}
-                    total={visibleFeatures.length}
+                    total={features.length}
                     rotationY={rotationY}
                     pitch={80}
                   />
                 );
               }
 
-              const angle = (index / visibleFeatures.length) * 360;
+              const angle = (index / features.length) * 360;
 
               return (
                 // 1. The Anchor Point: a 0x0 dot perfectly centered in the parent.
@@ -327,7 +321,7 @@ export default function BarrelFeatureSection({
         </div>
 
         <div className="flex min-h-[14.7rem] snap-x snap-mandatory items-center gap-4 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:hidden">
-          {visibleFeatures.map((feature) => (
+          {features.map((feature) => (
             <FeatureCard
               key={feature._id}
               feature={feature}
@@ -337,5 +331,29 @@ export default function BarrelFeatureSection({
         </div>
       </div>
     </section>
+  );
+}
+
+export default function BarrelFeatureSection({
+  features,
+  heading,
+  layout = "barrel",
+}: {
+  features: Array<SchoolFeature | null>;
+  heading: string;
+  layout?: "barrel" | "helix";
+}) {
+  const visibleFeatures = features.filter((feature): feature is SchoolFeature =>
+    Boolean(feature?.title && feature.linkUrl),
+  );
+
+  if (visibleFeatures.length === 0) return null;
+
+  return (
+    <BarrelFeatureContent
+      features={visibleFeatures}
+      heading={heading}
+      layout={layout}
+    />
   );
 }

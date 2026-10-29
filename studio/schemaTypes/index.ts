@@ -4,7 +4,7 @@ import {homePage} from './homePage'
 import {newsArticle} from './newsArticle'
 import {siteSettings} from './siteSettings'
 import {schoolFeature} from './schoolFeature'
-import {schoolFeatureSettings} from './schoolFeatureSettings'
+import {schoolFeaturesSettings} from './schoolFeatureSettings'
 
 export const schemaTypes = [
   localizedString,
@@ -13,5 +13,5 @@ export const schemaTypes = [
   newsArticle,
   siteSettings,
   schoolFeature,
-  schoolFeatureSettings,
+  schoolFeaturesSettings,
 ]

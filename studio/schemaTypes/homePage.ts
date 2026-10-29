@@ -27,7 +27,6 @@ export const homePage = defineType({
         layout: 'radio',
       },
       initialValue: 'barrel',
-      validation: (rule) => rule.required(),
     }),
 
     defineField({

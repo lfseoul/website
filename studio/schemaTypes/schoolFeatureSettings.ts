@@ -1,8 +1,8 @@
 import {defineType, defineField} from 'sanity'
 
-export const schoolFeatureSettings = defineType({
+export const schoolFeaturesSettings = defineType({
   name: 'schoolFeaturesSettings',
-  title: 'News Feature Layout',
+  title: 'School Features Layout',
   type: 'document',
   fields: [
     defineField({
@@ -22,7 +22,7 @@ export const schoolFeatureSettings = defineType({
   ],
   preview: {
     prepare() {
-      return {title: 'News Feature Layout'}
+      return {title: 'School Features Layout'}
     },
   },
 })
