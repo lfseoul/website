@@ -29,22 +29,22 @@ const sharedConfig = {
             S.documentTypeListItem('homePage').title('Home Page Content'),
             S.divider(),
             S.listItem()
-              .title('News Feature')
+              .title('School Features')
               .child(
                 S.list()
-                  .title('News Feature')
+                  .title('School Features')
                   .items([
                     S.listItem()
-                      .title('News Feature Layout')
+                      .title('School Features Layout')
                       .child(
                         S.document()
                           .schemaType('schoolFeaturesSettings')
                           .documentId('schoolFeaturesSettings'),
                       ),
-                    S.documentTypeListItem('schoolFeature').title('News Feature'),
+                    S.documentTypeListItem('schoolFeature').title('School Features'),
                   ]),
               ),
-            S.documentTypeListItem('newsArticle').title('News Article'),
+            S.documentTypeListItem('newsArticle').title('News Articles'),
             S.listItem()
               .title('Site Settings')
               .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
