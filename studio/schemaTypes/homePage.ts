@@ -13,6 +13,22 @@ export const homePage = defineType({
       type: 'image',
       options: {hotspot: true},
     }),
+    defineField({
+      name: 'featureLayout',
+      title: 'School Features Layout',
+      type: 'string',
+      hidden: true,
+      readOnly: true,
+      options: {
+        list: [
+          {title: 'Barrel', value: 'barrel'},
+          {title: 'Helix', value: 'helix'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'barrel',
+      validation: (rule) => rule.required(),
+    }),
 
     defineField({
       name: 'newsArticles',

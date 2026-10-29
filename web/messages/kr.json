@@ -1,4 +1,16 @@
 {
+  "Navbar": {
+    "home": "LFS 홈",
+    "mainNavigation": "주요 메뉴",
+    "admissions": "입학",
+    "academics": "교육과정",
+    "campusLife": "캠퍼스 생활",
+    "aboutUs": "학교 소개",
+    "parentPortal": "학부모 포털",
+    "applyNow": "지원하기",
+    "openMenu": "메뉴 열기",
+    "closeMenu": "메뉴 닫기"
+  },
   "HomePage": {
     "title": "서울프랑스학교에 오신 것을 환영합니다",
     "description": "국제 교육의 탁월함.",
@@ -19,5 +31,8 @@
       "admissions": "입학",
       "campusLife": "캠퍼스 생활"
     }
+  },
+  "HelixFeatures": {
+    "heading": "우리 학교의 특색"
   }
 }

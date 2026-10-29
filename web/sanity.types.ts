@@ -15,6 +15,69 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
+export type SchoolFeaturesSettings = {
+  _id: string;
+  _type: "schoolFeaturesSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  layout?: "barrel" | "helix";
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type SchoolFeature = {
+  _id: string;
+  _type: "schoolFeature";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: LocalizedString;
+  description?: {
+    en?: string;
+    fr?: string;
+    kr?: string;
+  };
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  linkUrl?: string;
+  badge?: LocalizedString;
+  cardType?: "standard" | "centered";
+};
+
+export type LocalizedString = {
+  _type: "localizedString";
+  en?: string;
+  fr?: string;
+  kr?: string;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
 export type SiteSettings = {
   _id: string;
   _type: "siteSettings";
@@ -35,13 +98,6 @@ export type SiteSettings = {
     email?: string;
     website?: string;
   };
-};
-
-export type LocalizedString = {
-  _type: "localizedString";
-  en?: string;
-  fr?: string;
-  kr?: string;
 };
 
 export type LocalizedBlock = {
@@ -102,13 +158,6 @@ export type LocalizedBlock = {
   }>;
 };
 
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
 export type NewsArticle = {
   _id: string;
   _type: "newsArticle";
@@ -127,22 +176,6 @@ export type NewsArticle = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type Slug = {
@@ -180,6 +213,7 @@ export type HomePage = {
     crop?: SanityImageCrop;
     _type: "image";
   };
+  featureLayout?: "barrel" | "helix";
   newsArticles?: Array<
     {
       _key: string;
@@ -304,13 +338,15 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | SiteSettings
-  | LocalizedString
-  | LocalizedBlock
+  | SchoolFeaturesSettings
   | SanityImageAssetReference
-  | NewsArticle
+  | SchoolFeature
+  | LocalizedString
   | SanityImageCrop
   | SanityImageHotspot
+  | SiteSettings
+  | LocalizedBlock
+  | NewsArticle
   | Slug
   | NewsArticleReference
   | SanityFileAssetReference
@@ -344,9 +380,28 @@ export type NEWS_QUERY_RESULT = Array<{
 
 // Source: ../web/src/app/[locale]/page.tsx
 // Variable: PAGE_QUERY
-// Query: {  "home": *[_type == "homePage" && !(_id in path("drafts.**"))][0] {  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),  heroImage,  "sections": sections[] {    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),    image,    youtubeId,    "videoUrl": backgroundVideo.asset->url // <-- Added this line!  },  "newsArticles": newsArticles[0...3]-> {    _id,    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),    category,    publishedAt,    mainImage  }  },  "settings": *[_type == "siteSettings" && !(_id in path("drafts.**"))][0] {    siteTitle,    "footerDescription": select(      $locale == "en" => pt::text(footerDescription.en),      $locale == "fr" => pt::text(footerDescription.fr),      pt::text(footerDescription.kr)    ),    "quickLinks": quickLinks[]{      _key,      "label": select($locale == "en" => label.en, $locale == "fr" => label.fr, label.kr),      url    },    "contactInfo": {      "address": select(        $locale == "en" => contactInfo.address.en,        $locale == "fr" => contactInfo.address.fr,        contactInfo.address.kr      ),      phoneNumber,      email,      website    }  }}
+// Query: {  "features": *[_type == "schoolFeature" && !(_id in path("drafts.**"))] | order(_createdAt asc) {    _id,    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "description": select($locale == "en" => description.en, $locale == "fr" => description.fr, description.kr),    "badge": select($locale == "en" => badge.en, $locale == "fr" => badge.fr, badge.kr),    image,    linkUrl,    cardType  },  "featureSettings": *[_type == "schoolFeaturesSettings" && !(_id in path("drafts.**"))][0] {    layout  },  "home": *[_type == "homePage" && !(_id in path("drafts.**"))][0] {  featureLayout,  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),  heroImage,  "sections": sections[] {    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),    image,    youtubeId,    "videoUrl": backgroundVideo.asset->url // <-- Added this line!  },  "newsArticles": newsArticles[0...3]-> {    _id,    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),    category,    publishedAt,    mainImage  }  },  "settings": *[_type == "siteSettings" && !(_id in path("drafts.**"))][0] {    siteTitle,    "footerDescription": select(      $locale == "en" => pt::text(footerDescription.en),      $locale == "fr" => pt::text(footerDescription.fr),      pt::text(footerDescription.kr)    ),    "quickLinks": quickLinks[]{      _key,      "label": select($locale == "en" => label.en, $locale == "fr" => label.fr, label.kr),      url    },    "contactInfo": {      "address": select(        $locale == "en" => contactInfo.address.en,        $locale == "fr" => contactInfo.address.fr,        contactInfo.address.kr      ),      phoneNumber,      email,      website    }  }}
 export type PAGE_QUERY_RESULT = {
+  features: Array<{
+    _id: string;
+    title: string | null;
+    description: string | null;
+    badge: string | null;
+    image: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+    linkUrl: string | null;
+    cardType: "centered" | "standard" | null;
+  }>;
+  featureSettings: {
+    layout: "barrel" | "helix" | null;
+  } | null;
   home: {
+    featureLayout: "barrel" | "helix" | null;
     title: string | null;
     description: Array<{
       children?: Array<{
@@ -440,7 +495,7 @@ export type PAGE_QUERY_RESULT = {
 declare global {
   interface SanityQueries {
     '*[_type == "newsArticle" && !(_id in path("drafts.**"))] | order(publishedAt desc) {\n  _id,\n  "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n  "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),\n  category,\n  publishedAt,\n  mainImage\n}': NEWS_QUERY_RESULT;
-    '{\n  "home": *[_type == "homePage" && !(_id in path("drafts.**"))][0] {\n  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),\n  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),\n  heroImage,\n  "sections": sections[] {\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),\n    image,\n    youtubeId,\n    "videoUrl": backgroundVideo.asset->url // <-- Added this line!\n  },\n  "newsArticles": newsArticles[0...3]-> {\n    _id,\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),\n    category,\n    publishedAt,\n    mainImage\n  }\n  },\n  "settings": *[_type == "siteSettings" && !(_id in path("drafts.**"))][0] {\n    siteTitle,\n    "footerDescription": select(\n      $locale == "en" => pt::text(footerDescription.en),\n      $locale == "fr" => pt::text(footerDescription.fr),\n      pt::text(footerDescription.kr)\n    ),\n    "quickLinks": quickLinks[]{\n      _key,\n      "label": select($locale == "en" => label.en, $locale == "fr" => label.fr, label.kr),\n      url\n    },\n    "contactInfo": {\n      "address": select(\n        $locale == "en" => contactInfo.address.en,\n        $locale == "fr" => contactInfo.address.fr,\n        contactInfo.address.kr\n      ),\n      phoneNumber,\n      email,\n      website\n    }\n  }\n}': PAGE_QUERY_RESULT;
+    '{\n  "features": *[_type == "schoolFeature" && !(_id in path("drafts.**"))] | order(_createdAt asc) {\n    _id,\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "description": select($locale == "en" => description.en, $locale == "fr" => description.fr, description.kr),\n    "badge": select($locale == "en" => badge.en, $locale == "fr" => badge.fr, badge.kr),\n    image,\n    linkUrl,\n    cardType\n  },\n  "featureSettings": *[_type == "schoolFeaturesSettings" && !(_id in path("drafts.**"))][0] {\n    layout\n  },\n  "home": *[_type == "homePage" && !(_id in path("drafts.**"))][0] {\n  featureLayout,\n  "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),\n  "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),\n  heroImage,\n  "sections": sections[] {\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "text": select($locale == "en" => text.en, $locale == "fr" => text.fr, text.kr),\n    image,\n    youtubeId,\n    "videoUrl": backgroundVideo.asset->url // <-- Added this line!\n  },\n  "newsArticles": newsArticles[0...3]-> {\n    _id,\n    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),\n    "excerpt": select($locale == "en" => excerpt.en, $locale == "fr" => excerpt.fr, excerpt.kr),\n    category,\n    publishedAt,\n    mainImage\n  }\n  },\n  "settings": *[_type == "siteSettings" && !(_id in path("drafts.**"))][0] {\n    siteTitle,\n    "footerDescription": select(\n      $locale == "en" => pt::text(footerDescription.en),\n      $locale == "fr" => pt::text(footerDescription.fr),\n      pt::text(footerDescription.kr)\n    ),\n    "quickLinks": quickLinks[]{\n      _key,\n      "label": select($locale == "en" => label.en, $locale == "fr" => label.fr, label.kr),\n      url\n    },\n    "contactInfo": {\n      "address": select(\n        $locale == "en" => contactInfo.address.en,\n        $locale == "fr" => contactInfo.address.fr,\n        contactInfo.address.kr\n      ),\n      phoneNumber,\n      email,\n      website\n    }\n  }\n}': PAGE_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

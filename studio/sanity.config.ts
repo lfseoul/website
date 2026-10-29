@@ -11,11 +11,45 @@ const siteSettingsSingleton = defineSingleton({
   schemaType: 'siteSettings',
 })
 
+const schoolFeaturesSettingsSingleton = defineSingleton({
+  id: 'schoolFeaturesSettings',
+  documentId: 'schoolFeaturesSettings',
+  schemaType: 'schoolFeaturesSettings',
+})
+
 // 1. Group all existing settings so they apply to both workspaces
 const sharedConfig = {
   projectId: '925755f8',
   plugins: [
-    structureTool(),
+    structureTool({
+      structure: (S) =>
+        S.list()
+          .title('Website Content')
+          .items([
+            S.documentTypeListItem('homePage').title('Home Page Content'),
+            S.divider(),
+            S.listItem()
+              .title('News Feature')
+              .child(
+                S.list()
+                  .title('News Feature')
+                  .items([
+                    S.listItem()
+                      .title('News Feature Layout')
+                      .child(
+                        S.document()
+                          .schemaType('schoolFeaturesSettings')
+                          .documentId('schoolFeaturesSettings'),
+                      ),
+                    S.documentTypeListItem('schoolFeature').title('News Feature'),
+                  ]),
+              ),
+            S.documentTypeListItem('newsArticle').title('News Article'),
+            S.listItem()
+              .title('Site Settings')
+              .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
+          ]),
+    }),
     visionTool(),
     presentationTool({
       previewUrl: {
@@ -37,7 +71,7 @@ const sharedConfig = {
     types: schemaTypes,
   },
   document: {
-    singletons: [siteSettingsSingleton],
+    singletons: [siteSettingsSingleton, schoolFeaturesSettingsSingleton],
   },
 }
 

@@ -11,12 +11,16 @@ import {
 import { PortableText, type PortableTextProps } from "@portabletext/react";
 import Image from "next/image";
 import Navbar from "./Navbar";
+import ChapterDots from "./ChapterDots";
 import Footer from "./Footer";
 import type { FooterSettings } from "./Footer";
 import NewsAndEvents, {
   type NewsAndEventsLabels,
   type NewsArticle,
 } from "./NewsAndEvents";
+import BarrelFeatureSection, {
+  type SchoolFeature,
+} from "./BarrelFeatureSection";
 import { urlFor } from "../sanity/image";
 
 type PortableTextValue = PortableTextProps["value"];
@@ -31,12 +35,20 @@ type ScrollytellingSection = {
   videoUrl?: string | null;
 };
 type ScrollytellingContent = {
+  featureLayout?: "barrel" | "helix" | null;
   title?: string | null;
   description?: PortableTextValue;
   heroImage?: SanityImage;
   sections?: ScrollytellingSection[] | null;
   newsArticles?: Array<NewsArticle | null> | null;
 };
+
+const sectionChapterIds = [
+  "enseignement",
+  "nos-specificites",
+  "vie-au-lycee",
+  "rejoignez-nous",
+];
 
 // Helper to extract the 11-character YouTube ID from a full URL or raw ID
 function extractYouTubeId(urlOrId: string) {
@@ -57,12 +69,14 @@ function ParallaxSection({
   image,
   videoUrl,
   youtubeId,
+  id,
   children,
   className,
 }: {
   image?: SanityImage;
   videoUrl?: string;
   youtubeId?: string | null;
+  id?: string;
   children: React.ReactNode;
   className: string;
 }) {
@@ -85,6 +99,7 @@ function ParallaxSection({
 
   return (
     <section
+      id={id}
       ref={ref}
       className={`relative h-screen flex flex-col justify-center overflow-hidden ${className}`}
     >
@@ -135,44 +150,68 @@ function ParallaxSection({
 
 export default function ScrollytellingView({
   content,
+  features,
+  featureLayout,
   settings,
   locale,
+  featureHeading,
   newsLabels,
 }: {
   content: ScrollytellingContent;
+  features: Array<SchoolFeature | null>;
+  featureLayout: "barrel" | "helix";
   settings: FooterSettings;
   locale: string;
+  featureHeading: string;
   newsLabels: NewsAndEventsLabels;
 }) {
   const newsArticles = content.newsArticles ?? [];
+  const chapters = [
+    ...(content.title ? [{ id: "le-lfs", label: content.title }] : []),
+    ...(content.sections ?? [])
+      .slice(0, sectionChapterIds.length)
+      .flatMap((section, index) =>
+        section.title
+          ? [{ id: sectionChapterIds[index], label: section.title }]
+          : [],
+      ),
+    ...(features.length > 0
+      ? [{ id: "school-features", label: featureHeading }]
+      : []),
+    { id: "latest-news-and-events", label: newsLabels.heading },
+  ];
 
   return (
-    <main className="bg-black text-white selection:bg-white selection:text-black overflow-hidden">
+    <main className="bg-black text-white selection:bg-white selection:text-black overflow-x-clip">
       <Navbar currentLocale={locale} />
+      <ChapterDots chapters={chapters} />
 
       {/* HERO SECTION (Static) */}
       <ParallaxSection
+        id="le-lfs"
         image={content.heroImage}
         className="items-center p-8 text-center"
       >
-        <motion.h1
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false }}
-          className="mb-6 w-full text-center text-5xl font-bold tracking-tight drop-shadow-lg md:text-7xl"
-        >
-          {content.title}
-        </motion.h1>
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false }}
-          className="mx-auto text-xl md:text-3xl text-gray-200 max-w-3xl drop-shadow-md space-y-4"
-        >
-          <PortableText value={content.description} />
-        </motion.div>
+        <div className="mx-auto flex w-full flex-col items-center text-center">
+          <motion.h1
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false }}
+            className="mx-auto mb-6 w-full text-center text-5xl font-bold tracking-tight drop-shadow-lg md:text-7xl"
+          >
+            {content.title}
+          </motion.h1>
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false }}
+            className="mx-auto max-w-3xl space-y-4 text-xl text-gray-200 drop-shadow-md md:text-3xl"
+          >
+            <PortableText value={content.description} />
+          </motion.div>
+        </div>
       </ParallaxSection>
 
       {/* DYNAMIC SECTIONS */}
@@ -188,6 +227,7 @@ export default function ScrollytellingView({
         return (
           <ParallaxSection
             key={index}
+            id={sectionChapterIds[index]}
             image={section.image}
             youtubeId={section.youtubeId}
             className={`p-8 md:p-24 ${alignmentClass}`}
@@ -214,7 +254,14 @@ export default function ScrollytellingView({
         );
       })}
 
+      <BarrelFeatureSection
+        features={features}
+        heading={featureHeading}
+        layout={featureLayout}
+      />
+
       <NewsAndEvents
+        id="latest-news-and-events"
         articles={newsArticles}
         locale={locale}
         labels={newsLabels}

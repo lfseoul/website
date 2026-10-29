@@ -36,11 +36,13 @@ const dateLocales: Record<string, string> = {
 };
 
 export default function NewsAndEvents({
+  id,
   articles,
   locale,
   labels,
   viewAllHref,
 }: {
+  id?: string;
   articles: Array<NewsArticle | null>;
   locale: string;
   labels: NewsAndEventsLabels;
@@ -59,7 +61,10 @@ export default function NewsAndEvents({
     }).format(new Date(date));
 
   return (
-    <section className="relative z-20 bg-white px-6 py-20 text-slate-900 sm:py-24">
+    <section
+      id={id}
+      className="relative z-20 bg-white px-6 py-20 text-slate-900 sm:py-24"
+    >
       <div className="mx-auto max-w-5xl">
         <header className="mb-9 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">

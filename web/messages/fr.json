@@ -1,4 +1,16 @@
 {
+  "Navbar": {
+    "home": "Accueil LFS",
+    "mainNavigation": "Navigation principale",
+    "admissions": "Admissions",
+    "academics": "Enseignement",
+    "campusLife": "Vie du campus",
+    "aboutUs": "À propos",
+    "parentPortal": "Espace parents",
+    "applyNow": "Candidater",
+    "openMenu": "Ouvrir le menu de navigation",
+    "closeMenu": "Fermer le menu de navigation"
+  },
   "HomePage": {
     "title": "Bienvenue au Lycée Français de Séoul",
     "description": "L'excellence dans l'éducation internationale.",
@@ -19,5 +31,8 @@
       "admissions": "Admissions",
       "campusLife": "Vie du campus"
     }
+  },
+  "HelixFeatures": {
+    "heading": "Les atouts de notre école"
   }
 }

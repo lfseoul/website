@@ -6,7 +6,20 @@ import { client } from "../../sanity/client";
 import ScrollytellingView from "../../components/ScrollytellingView";
 
 const PAGE_QUERY = defineQuery(`{
+  "features": *[_type == "schoolFeature" && !(_id in path("drafts.**"))] | order(_createdAt asc) {
+    _id,
+    "title": select($locale == "en" => title.en, $locale == "fr" => title.fr, title.kr),
+    "description": select($locale == "en" => description.en, $locale == "fr" => description.fr, description.kr),
+    "badge": select($locale == "en" => badge.en, $locale == "fr" => badge.fr, badge.kr),
+    image,
+    linkUrl,
+    cardType
+  },
+  "featureSettings": *[_type == "schoolFeaturesSettings" && !(_id in path("drafts.**"))][0] {
+    layout
+  },
   "home": *[_type == "homePage" && !(_id in path("drafts.**"))][0] {
+  featureLayout,
   "title": select($locale == "en" => heroTitle.en, $locale == "fr" => heroTitle.fr, heroTitle.kr),
   "description": select($locale == "en" => heroDescription.en, $locale == "fr" => heroDescription.fr, heroDescription.kr),
   heroImage,
@@ -59,6 +72,10 @@ export default async function HomePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "NewsAndEvents" });
+  const featureHeading = await getTranslations({
+    locale,
+    namespace: "HelixFeatures",
+  });
   const newsLabels = {
     heading: t("heading"),
     description: t("description"),
@@ -91,8 +108,15 @@ export default async function HomePage({
   return (
     <ScrollytellingView
       content={pageData.home}
+      features={pageData.features ?? []}
+      featureLayout={
+        pageData.featureSettings?.layout ??
+        pageData.home.featureLayout ??
+        "barrel"
+      }
       settings={pageData.settings}
       locale={locale}
+      featureHeading={featureHeading("heading")}
       newsLabels={newsLabels}
     />
   );

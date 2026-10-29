@@ -34,7 +34,7 @@ export default function Footer({ settings }: { settings: FooterSettings }) {
       }));
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-blue-950 text-white">
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-14 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:gap-8 lg:py-16">
         <div>
           <h2 className="text-lg font-bold">

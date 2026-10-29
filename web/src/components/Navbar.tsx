@@ -2,19 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "../i18n/navigation";
 import LanguageSwitcher from "./LanguageSwitcher";
 import logo from "../assets/LFS_logo_couleur_transparent-64x100.png";
 
 const navigationLinks = [
-  { label: "Admissions", href: "#admissions" },
-  { label: "Academics", href: "#academics" },
-  { label: "Campus Life", href: "#campus-life" },
-  { label: "About Us", href: "#about-us" },
-  { label: "Parent Portal", href: "#parent-portal" },
+  { label: "admissions", href: "#admissions" },
+  { label: "academics", href: "#academics" },
+  { label: "campusLife", href: "#campus-life" },
+  { label: "aboutUs", href: "#about-us" },
+  { label: "parentPortal", href: "#parent-portal" },
 ];
 
 export default function Navbar({ currentLocale }: { currentLocale: string }) {
+  const t = useTranslations("Navbar");
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -48,7 +50,7 @@ export default function Navbar({ currentLocale }: { currentLocale: string }) {
         <Link
           href="/"
           locale={currentLocale}
-          aria-label="LFS home"
+          aria-label={t("home")}
           className="shrink-0"
         >
           <Image
@@ -60,14 +62,17 @@ export default function Navbar({ currentLocale }: { currentLocale: string }) {
         </Link>
 
         <div className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 xl:flex">
-          <nav aria-label="Main navigation" className="flex items-center gap-5">
+          <nav
+            aria-label={t("mainNavigation")}
+            className="flex items-center gap-5"
+          >
             {navigationLinks.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
                 className={`whitespace-nowrap text-[13px] font-semibold transition-colors ${linkColor}`}
               >
-                {item.label}
+                {t(item.label)}
               </a>
             ))}
           </nav>
@@ -75,7 +80,7 @@ export default function Navbar({ currentLocale }: { currentLocale: string }) {
             href="#apply-now"
             className={`whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-bold transition-colors ${applyButtonColor}`}
           >
-            Apply Now
+            {t("applyNow")}
           </a>
         </div>
 
@@ -95,9 +100,7 @@ export default function Navbar({ currentLocale }: { currentLocale: string }) {
           />
           <button
             type="button"
-            aria-label={
-              isMenuOpen ? "Close navigation menu" : "Open navigation menu"
-            }
+            aria-label={isMenuOpen ? t("closeMenu") : t("openMenu")}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-navigation"
             onClick={() => setIsMenuOpen((open) => !open)}
@@ -126,7 +129,7 @@ export default function Navbar({ currentLocale }: { currentLocale: string }) {
 
       <nav
         id="mobile-navigation"
-        aria-label="Mobile navigation"
+        aria-label={t("mainNavigation")}
         className={`${
           isMenuOpen ? "block" : "hidden"
         } absolute left-0 top-full w-full border-t border-slate-200 bg-white px-5 pb-5 pt-3 text-slate-900 shadow-lg xl:hidden`}
@@ -139,7 +142,7 @@ export default function Navbar({ currentLocale }: { currentLocale: string }) {
               onClick={closeMenu}
               className="border-b border-slate-100 py-3 text-sm font-semibold text-slate-700 hover:text-blue-800"
             >
-              {item.label}
+              {t(item.label)}
             </a>
           ))}
           <a
@@ -147,7 +150,7 @@ export default function Navbar({ currentLocale }: { currentLocale: string }) {
             onClick={closeMenu}
             className="mt-4 w-fit rounded-lg bg-red-700 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-red-800"
           >
-            Apply Now
+            {t("applyNow")}
           </a>
         </div>
       </nav>
